@@ -8,11 +8,11 @@ see section 'getting started for non coders' below
 
 # AUTHENTICATION:
 
-After running "controller.py", user will be prompted for their linkedin credentials
+After running "interlink.py", user will be prompted for their linkedin credentials
 
 # HOW TO:
 
-'controller.py' is the main module that controls the submodules.
+'interlink.py' is the main module that controls the submodules.
 
 USER will be prompted to select the action they'd like to take:
 
@@ -24,7 +24,7 @@ USER will be prompted to select the action they'd like to take:
 
 # CODE PROCESS:
 
-controller will then attempt to:
+`interlink.py' will then attempt to:
 
 1. parse through VC list and scrap info for any VC's that haven't been recorded as scraped from linkedin
 2. remove any emoticons and emojis from the results
@@ -80,7 +80,7 @@ This guide provides step-by-step instructions on how to run a Python script from
 
 1. After installing the dependencies, you can run the Python script using the following command:
 
-   python3 controller.py
+   python3 interlink.py
 
 2. Press Enter to execute the script. The output, if any, will be displayed in the terminal.
 

@@ -1,96 +1,235 @@
-# opens the json
-# looks at the mutual connections
-# compiles a list of all the people that they are connected to at different VC's
-# composes a message with a list of the VC's and people we are trying to connect
-# inputs the message in a cell the message should say (1. I feel like you know me well enough to do this 2. if you don't know about ruck, I can tell you about it 3. which of the following peoples are a good fit for ruck to reach out to for funding and that you're comfortable with.)
-# creates 1. a familiar message 2. an unfamiliar message 3. a no message option.
-# stores a json record of those that have been outreached to and prevents repeat message. CRITICAL
-
-
 import json
-import os
 
-def network(json_file_path):
+import clean
+import link_vcs
+import find_connections
+import approve
+import filter_vc_list
+
+default_connections_filepath = 'connections.json'
+
+def filter_csv_to_json(csv_path, stage):
+    output_filepath = filter_vc_list.filter_vcs(csv_path, stage)
+    
+    return output_filepath
+
+def find_connections_for_vcs(json_file_path, target_connections_count):
+
+    def export():
+        response = input("Would you like to export to approval CSV? (y/n): ")
+
+        responded = False
+
+        #gets the target amout to connect with
+        while responded == False:
+            if (response.lower() == 'y') or (response.lower() == 'yes'):
+                responded = True
+                return True
+
+            elif (response.lower() == 'n') or (response.lower() == 'no'):
+                responded = True
+                return False
+            
+            else:
+                print("Invalid input. Please enter 'y' or 'n'.")
+
 
     with open(json_file_path, "r") as json_file:
-        connect_map = json.load(json_file)
+        data = json.load(json_file)
 
-    first_degree_connectors = []
-    first_degree_targets = []
+    driver = None
 
-    for vc in connect_map:
-        if vc['people and connections'] != None:
-            for target in vc['people and connections']:
-                if target['degree'] == 2:
-                    mutual_connections = target['connections']['1st connections']
-                    for m in mutual_connections:
-                        f_found = False
-                        f_c  = -1
-                        for f in first_degree_connectors:
-                            f_c += 1
-                            if m['name'] == f['name']:
-                                f_found = True
-                                break
-                        if f_found == False:
-                            first_degree_connectors.append({
-                                'name': m['name'],
-                                'info': m,
-                                'connected vcs':[{
-                                    'vc name': vc['vc']['name'],
-                                    'info': {
-                                        'linkedin': vc['vc']['linkedin'],
-                                        'tagline': vc['vc tagline'],
-                                        'overview': vc['vc overview']
-                                    },
-                                    '2nd degree connections':[
-                                        target
-                                    ]
-                                }]
-                                
-                            })
+    try:
+        connections_file_path, driver = find_connections.connect_with_vcs(data, False, target_connections_count)
+
+        print ('list of VCs parsed, results in filepath:', connections_file_path)
+        
+        approval = export()
+
+        if approval:
+            export_approval_csvs()
+ 
+    except Exception as e:
+        print ('linkedin scrape failed, error:', e)
+
+    # Check if driver is assigned and close it if necessary
+    if driver is not None:
+        driver.quit()
+
+
+
+def export_approval_csvs(export_final_csv = False, preview = False, intro_msg_filepath = 'outbound_intro_msg.txt'):
+
+    connections_file_path = 'connections.json'
+
+    try:
+        demoticoned_path = clean.clean_json_file(connections_file_path)
+        
+        try:
+            interlinked_filepath = link_vcs.network(demoticoned_path)
+
+            if preview == False:
+
+                try:
+                        approved_people_filepath, approved_vcs_filepath = approve.prepare_approval(interlinked_filepath)
+
+                        if export_final_csv == True:
+
+                            final_approved_filepath = approve.compile_approvals(approved_people_filepath, approved_vcs_filepath, interlinked_filepath, intro_msg_filepath)
+
+                            return final_approved_filepath
+                        
                         else:
-                            vc_found = False
-                            f_vc_c = -1
-                            for f_vc in first_degree_connectors[f_c]['connected vcs']:
-                                f_vc_c += 1
-                                if vc['vc']['name'] == f_vc['vc name']:
-                                    vc_found = True
-                                    break
-                            if vc_found == False:
-                                first_degree_connectors[f_c]['connected vcs'].append({
-                                        'vc name': vc['vc']['name'],
-                                        'info': {
-                                            'linkedin': vc['vc']['linkedin'],
-                                            'tagline': vc['vc tagline'],
-                                            'overview': vc['vc overview']
-                                        },
-                                        '2nd degree connections':[
-                                            target
-                                        ]
-                                    })
-                            else:
-                                first_degree_connectors[f_c]['connected vcs'][f_vc_c]['2nd degree connections'].append(target)
+                            
+                            return approved_people_filepath, approved_vcs_filepath
 
-                elif target['degree'] == 1:
-                    first_degree_targets.append(target)
+                except Exception as e:
+                    print ('error creating approval sheet:', e)
 
-    network = {
-        'first degree connectors': sorted(first_degree_connectors, key=lambda x: x['name']),
-        'first degree targets': sorted(first_degree_targets, key=lambda x: x['primary target']['name'])
-    }
+            else:
+                with open(interlinked_filepath, "r") as json_file:
+                    connections_list = json.load(json_file)
 
-    output_file_path = json_file_path[:json_file_path.find('__emoticons')] + '__final_network_map.json'
+                print ('Preview data in debugger window.')
 
-    with open(output_file_path, 'w') as f:
-        json.dump(network, f, indent=4)
+        except Exception as e:
+                print ('error interlinking connections:', e)
 
-    #remove previous file
-    os.remove(json_file_path)
+    except Exception as e:
+        print ('error with saving to demoticon file:', e)
 
-    print ('final network map saved to', output_file_path)
 
+
+
+def action_prompt(options):
+    for i, option in enumerate(options):
+        print(f"{i+1}. {option}")
+
+    choice = None
+    while choice is None:
+        try:
+            user_choice = int(input("Enter your choice (number): ").strip())
+            if 1 <= user_choice <= len(options):
+                choice = user_choice
+            else:
+                print("Invalid choice. Please try again.")
+        except ValueError:
+            print("Invalid choice. Please enter a number.")
+
+    return choice
+
+
+def initialize():
+
+    def get_target_connections_count():
+        response = input("Parse entire list? (y/n): ")
+
+        target_connections_count = None
+
+        #gets the target amout to connect with
+        if (response.lower() == 'y') or (response.lower() == 'yes'):
+            target_connections_count = 0
+
+        elif (response.lower() == 'n') or (response.lower() == 'no'):
+            while target_connections_count is None:
+                try:
+                    target_connections_count = int(input("Please enter target amount of connections (number):"))
+
+                except ValueError:
+                    print("Invalid choice. Please enter a number.")
+        else:
+            print("Invalid input. Please enter 'y' or 'n'.")
+
+        return target_connections_count
     
-    return output_file_path
+    options = [
+        'Filter new list of VCs', 
+        'Continue parsing existing list of VCs', 
+        'Preview/Print connections (DEBUGGER ONLY)',
+        'Export VC connections to approval CSVs',
+        'Compile approvals and compose outbound messages']
+    
+    
+    print ('\n' *2)
+    print('*'*60)
+    print('*'*60)
+    print('*'*60)
+    print ('\nINTERLINK\n')
+    print('*'*60)
+    print('*'*60)
+    print('*'*60)
+    print ('\n' *2)
+
+    response = action_prompt(options)
+
+
+    if response == 1:
+        #define source file
+        csv_path = input("Enter filepath for csv of VCs to parse:")
+
+        #define target investment stage
+        stage = input("Enter investment stage (one stage only) to target:")
+
+        #get list of VC's filtered from raw list
+        filtered_vc_list_by_stage_json_file = filter_csv_to_json(csv_path, stage)
+
+        #check if user wants to restrict total connections found
+        target_connections_count = get_target_connections_count()
+
+        #find connections
+        find_connections_for_vcs(filtered_vc_list_by_stage_json_file['output_filepath'], target_connections_count)
+
+    elif response == 2:
+        print ('using local file...')
+
+        #check if user wants to restrict total connections found
+        target_connections_count = get_target_connections_count()
+
+        #find connections
+
+        find_connections_for_vcs("master_list_vcs---filtered.json", target_connections_count)
+
+    elif response == 3:
+        print ('prepping preview of data for view in DEBUGGER...')
+
+        result = export_approval_csvs(False, True)
+
+        print ('Preview data above^^^')
+
+    elif response == 4:
+        print ('exporting connections, removing emoticons...')
+        
+        result = export_approval_csvs()
+
+        print ('export finished. output filepath:', result)
+
+    elif response == 5:
+        print ('compiling approved people and VCs')
+
+        results = export_approval_csvs(True)
+
+        print ('export finished. output filepath:', result)
+
+
+
+
 
 if __name__ == "__main__":
-    network('connections.json')
+
+    initialize()
+
+    
+'''
+user can either filter a list of VC's from scratch or
+start parsing the VC list from complete or with a total connected VC's goal set
+or it can just summarize the connections.json file as is and spit out the remainder
+
+needs to take the approvals already created, and append new companies to those approvals
+needs to record which people have already been reached out to, and skip those ones?
+or should it be based off which VC's you're trying to reach out to?
+should you be able to look at VC's and exclude them?
+
+so a list of VC's to contact that you are connected to, with a approval of bool to connecta
+and a list of 1st degree connections that you are connected to, with a approval of bool to connect
+then it compiles both lists and decides who to connect to and composes the messages accordingly
+'''
