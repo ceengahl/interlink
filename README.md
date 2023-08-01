@@ -16,20 +16,11 @@ After running "controller.py", user will be prompted for their linkedin credenti
 
 USER will be prompted to select the action they'd like to take:
 
-- enter a new list of VCs
-- continue parsing existing list of VCs
-- export current results to csv after cleaning and organizing the information
-- message the 1st connections for warm intros (pending, under development)
-
-After making a selection, user may be asked if he wants to parse the entire list of VCs or limit the amount of results
-
-User will be asked to enter linkedin credentials at the appropriate time.
-
-User will also be asked if they'd like to export the raw scrape data to a consummable CSV format after their list has been parsed. Respond Yes to get both a JSON file with '--final network' in the name with all the results, and an abbreviated decision making CSV called '1st_connections.csv'. In that CSV they will find a column asking if they'd like to reach out to this contact or not. Mark boolean TRUE/FALSE
-
-User will be asked to approve both first degree connections and their connected VCs for outreach - carefully review these CSVs to approve only those you should reach out to.
-
-After approving people and VCs, the final output will be a CSV with your approved first degree connections and a outbound request message with the VCs and the target contact. This message is ready to copy and paste into your linkedin messages or wherever.
+'Filter new list of VCs' - takes an input file from user provided filepath and filters by the investment stage user wants to target. **_FOLLOW FORMAT IN PROVIDED CSV_**
+'Continue parsing existing list of VCs' - continues parsing based on the file provided
+'Preview/Print connections (DEBUGGER ONLY)' - converts data to readable json and displays it in debugger
+'Export VC connections to approval CSVs' - exports two separate CSVs from interlinked VCs & first-connections 1) for 1st connections to approve for outreach and 2) VCs to approve for outreach
+'Compile approvals and compose outbound messages' - compiles the two approval CSVs into one CSV of all approved first connections and the connected VCs and composes an outbound message based on the template provided.
 
 # CODE PROCESS:
 

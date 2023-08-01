@@ -211,6 +211,7 @@ def check_people(li_people_url, driver):
         for el in people_page_el:
             if el.text.lower() == 'people':
                 el.click()
+                break
         
         # driver.get(li_people_url)
         print ('navigating to people info...')
@@ -366,7 +367,7 @@ def connect_with_vcs(data, li_logged_in, target_connections_count = 0):
             li_url = item['linkedin']
 
             #clear off final backslash if exists
-            if li_url[len(li_url)] == '/':
+            if li_url[-1] == '/':
                 li_url = li_url[:len(li_url)-1]
 
             if '/company/' in li_url.lower():

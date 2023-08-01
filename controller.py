@@ -47,7 +47,7 @@ def find_connections_for_vcs(json_file_path, target_connections_count):
         approval = export()
 
         if approval:
-            export_connections()
+            export_approval_csvs()
  
     except Exception as e:
         print ('linkedin scrape failed, error:', e)
@@ -58,7 +58,7 @@ def find_connections_for_vcs(json_file_path, target_connections_count):
 
 
 
-def export_connections(preview = False, intro_msg_filepath = 'outbound_intro_msg.txt'):
+def export_approval_csvs(export_final_csv = False, preview = False, intro_msg_filepath = 'outbound_intro_msg.txt'):
 
     connections_file_path = 'connections.json'
 
@@ -73,9 +73,15 @@ def export_connections(preview = False, intro_msg_filepath = 'outbound_intro_msg
                 try:
                         approved_people_filepath, approved_vcs_filepath = approve.prepare_approval(interlinked_filepath)
 
-                        final_approved_filepath = approve.compile_approvals(approved_people_filepath, approved_vcs_filepath, interlinked_filepath, intro_msg_filepath)
+                        if export_final_csv == True:
 
-                        return final_approved_filepath
+                            final_approved_filepath = approve.compile_approvals(approved_people_filepath, approved_vcs_filepath, interlinked_filepath, intro_msg_filepath)
+
+                            return final_approved_filepath
+                        
+                        else:
+                            
+                            return approved_people_filepath, approved_vcs_filepath
 
                 except Exception as e:
                     print ('error creating approval sheet:', e)
@@ -140,7 +146,8 @@ def initialize():
         'Filter new list of VCs', 
         'Continue parsing existing list of VCs', 
         'Preview/Print connections (DEBUGGER ONLY)',
-        'Export VC connections to approval CSVs']
+        'Export VC connections to approval CSVs',
+        'Compile approvals and compose outbound messages']
     
     
     print ('\n' *2)
@@ -185,14 +192,21 @@ def initialize():
     elif response == 3:
         print ('prepping preview of data for view in DEBUGGER...')
 
-        result = export_connections(True)
+        result = export_approval_csvs(False, True)
 
         print ('Preview data above^^^')
 
     elif response == 4:
         print ('exporting connections, removing emoticons...')
         
-        result = export_connections()
+        result = export_approval_csvs()
+
+        print ('export finished. output filepath:', result)
+
+    elif response == 5:
+        print ('compiling approved people and VCs')
+
+        results = export_approval_csvs(True)
 
         print ('export finished. output filepath:', result)
 
