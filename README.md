@@ -27,7 +27,9 @@ User will be asked to enter linkedin credentials at the appropriate time.
 
 User will also be asked if they'd like to export the raw scrape data to a consummable CSV format after their list has been parsed. Respond Yes to get both a JSON file with '--final network' in the name with all the results, and an abbreviated decision making CSV called '1st_connections.csv'. In that CSV they will find a column asking if they'd like to reach out to this contact or not. Mark boolean TRUE/FALSE
 
-\*\*\* more info soon on actual messaging user experience
+User will be asked to approve both first degree connections and their connected VCs for outreach - carefully review these CSVs to approve only those you should reach out to.
+
+After approving people and VCs, the final output will be a CSV with your approved first degree connections and a outbound request message with the VCs and the target contact. This message is ready to copy and paste into your linkedin messages or wherever.
 
 # CODE PROCESS:
 
@@ -36,8 +38,8 @@ controller will then attempt to:
 1. parse through VC list and scrap info for any VC's that haven't been recorded as scraped from linkedin
 2. remove any emoticons and emojis from the results
 3. reorganized the data scraped from linked from "by VC" to "by 1st degree mutual connections"
-4. create a csv file that has all the 1st degree mutual connections - user can then enter TRUE or FALSE under decision column for whether to reach out or not
-5. ---developing--- finally controller will take the decisions of the user from the csv and then attempt to message the 1st mutual connections with a message to invite them to help you connect to the 2nd degree connections.
+4. create 1 csv for approving your first degree connections you'd like to reach out to, and 1 csv for the VCs to approve for outreach as well
+5. combine your approved VCs and first connections and compose a final CSV with a templated message you can copy and paste to message your first degree connections
 
 # GETTING STARTED FOR NON CODERS
 
