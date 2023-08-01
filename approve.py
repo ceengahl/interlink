@@ -12,6 +12,8 @@ user is to copy and paste into linkedin messages or where ever, then mark as com
 
 import json
 import csv
+import sys
+
 
 
 
@@ -76,12 +78,12 @@ def prepare_approval(interlinked_filepath):
     return approved_people_filepath, approved_vcs_filepath
 
 
-def compose(f):
+def compose(f, intro_msg):
 
     print (f"composing message for {f['name'].title()}")
 
     first_name = f['name'][:f['name'].find(' ')].title()
-    intro_msg = f"{first_name}, I have been building Ruck for a bit now, and I think we are ready to raise a solid pre-seed round. I have been diving through LinkedIn to find all the different funds and the people that can connect me into those funds. Basically, I found connections that you may be able to help me with. \n\nI know that a lot of your LinkedIn connections may not be people you have actually met, but would you be opposed to looking at this list of and seeing if you're in a position to help me get in contact to start schedule a pitch for mid August?\n\nAlso, I'm not sure if these are the best people to contact. I just programmatically when through and found people that seemed to be decision makers at funds in a huge list. If you think these are not good contacts, please let me know!\n\n"
+    intro_msg = intro_msg.replace('__FIRST_NAME__', first_name)
 
     contact_list_msg = ''
 
@@ -95,7 +97,7 @@ def compose(f):
     return result
 
 
-def compile_approvals(approved_people_filepath, approved_vcs_filepath, interlinked_filepath):
+def compile_approvals(approved_people_filepath, approved_vcs_filepath, interlinked_filepath, intro_msg_filepath):
 
     try:
 
@@ -109,9 +111,6 @@ def compile_approvals(approved_people_filepath, approved_vcs_filepath, interlink
         print ('error opening files: ', e)
         return None
 
-    list_of_1sts = []
-    all_keys = []
-
     approved_first_degrees = []
 
     for c in data['first degree connectors']:
@@ -119,13 +118,17 @@ def compile_approvals(approved_people_filepath, approved_vcs_filepath, interlink
         approved_vc_requests = []
         for p in approved_people:
             if name.lower() == p['name'].lower():
+
                 # p['approved'] = True #testing only
+                
                 if p['approved'] == True:
                     for vc in c['connected vcs']:
                         vc_name = vc['vc name']
                         for v in approved_vcs:
                             if vc_name.lower() == v['name'].lower():
+                                
                                 # v['approved'] = True #testing only
+                                
                                 if v['approved'] == True:
                                     target = vc['2nd degree connections'][0]['primary target']
                                     try:
@@ -145,17 +148,39 @@ def compile_approvals(approved_people_filepath, approved_vcs_filepath, interlink
                         approved_first_degrees.append(p)
 
     if len(approved_first_degrees) > 0:
-        for q in approved_first_degrees:
-            q['message'] = compose(q)
+        with open(intro_msg_filepath, 'r') as file:
+            intro_msg = file.read()
 
-        final_filepath = 'final_approved_outbound_requests.csv'
+        print (f'''
+Your outbound message template currently reads:
+               
+{intro_msg}
 
-        save_json_to_csv(approved_first_degrees, final_filepath)
+               ''')
 
+        response = input("Would you like to proceed with this template? (y/n): ")
 
-        print (f"Final outbound CSV has been exported successfully to `{final_filepath}`. You may use the CSV to copy and paste outbound messages to your first degree connections.")
+        if (response.lower() == 'y') or (response.lower() == 'yes'):
 
-        return final_filepath
+            for q in approved_first_degrees:
+                q['message'] = compose(q, intro_msg)
+
+            final_filepath = 'final_approved_outbound_requests.csv'
+
+            save_json_to_csv(approved_first_degrees, final_filepath)
+
+            print (f"Final outbound CSV has been exported successfully to `{final_filepath}`. You may use the CSV to copy and paste outbound messages to your first degree connections.")
+
+            return final_filepath
+
+        elif (response.lower() == 'n') or (response.lower() == 'no'):
+            print ('please edit your template as necessary and re-initilize the controller to continue.')
+            print ('exiting interlink')
+
+            sys.exit()
+
+        else:
+            print("Invalid input. Please enter 'y' or 'n'.")
     
     else:
 
@@ -164,6 +189,11 @@ def compile_approvals(approved_people_filepath, approved_vcs_filepath, interlink
                No approved outbound requests were found, please check approval CSVs, `{approved_people_filepath}` and `{approved_vcs_filepath}`, to ensure that you marked TRUE or FALSE under the `approved` columns.
                {'*'*20}
                ''')
+        
+        sys.exit()
+
+
+
 
 if __name__ == '__main__':
     # prepare_approval()

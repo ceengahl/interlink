@@ -58,7 +58,7 @@ def find_connections_for_vcs(json_file_path, target_connections_count):
 
 
 
-def export_connections(preview = False):
+def export_connections(preview = False, intro_msg_filepath = 'outbound_intro_msg.txt'):
 
     connections_file_path = 'connections.json'
 
@@ -73,7 +73,7 @@ def export_connections(preview = False):
                 try:
                         approved_people_filepath, approved_vcs_filepath = approve.prepare_approval(interlinked_filepath)
 
-                        final_approved_filepath = approve.compile_approvals(approved_people_filepath, approved_vcs_filepath, interlinked_filepath)
+                        final_approved_filepath = approve.compile_approvals(approved_people_filepath, approved_vcs_filepath, interlinked_filepath, intro_msg_filepath)
 
                         return final_approved_filepath
 
@@ -85,7 +85,6 @@ def export_connections(preview = False):
                     connections_list = json.load(json_file)
 
                 print ('Preview data in debugger window.')
-
 
         except Exception as e:
                 print ('error interlinking connections:', e)
