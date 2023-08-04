@@ -403,7 +403,7 @@ def connect_with_vcs(data, li_logged_in, target_connections_count = 0):
                 connections = []
                 if company_details['qualified'] == True:
                     connections = check_people(li_people_url, driver)
-                    if (connections != None) or (connections != 'error'):
+                    if (connections != None) and (connections != 'error') and (len(connections) > 0):
                         compiled_obj = {
                             'vc': item,
                             'vc tagline': company_details['tagline'],
