@@ -1,5 +1,6 @@
 import json
 import re
+import traceback
 
 def clean_emoticons(input):
     tempstring = input
@@ -9,6 +10,7 @@ def clean_emoticons(input):
         return emoji_removed_string.strip()
     
     except Exception as e:
+        traceback.print_exc()
         print (e)
 
         return tempstring

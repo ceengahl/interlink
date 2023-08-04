@@ -5,7 +5,7 @@ import link_vcs
 import find_connections
 import approve
 import filter_vc_list
-
+import traceback
 default_connections_filepath = 'connections.json'
 
 def filter_csv_to_json(csv_path, stage):
@@ -50,6 +50,7 @@ def find_connections_for_vcs(json_file_path, target_connections_count):
             export_approval_csvs()
  
     except Exception as e:
+        traceback.print_exc()
         print ('linkedin scrape failed, error:', e)
 
     # Check if driver is assigned and close it if necessary
@@ -85,6 +86,7 @@ def export_approval_csvs(export_final_csv = False, preview = False, intro_msg_fi
                             return approved_people_filepath, approved_vcs_filepath
 
                 except Exception as e:
+                    traceback.print_exc()
                     print ('error creating approval sheet:', e)
 
             else:
@@ -94,9 +96,11 @@ def export_approval_csvs(export_final_csv = False, preview = False, intro_msg_fi
                 print ('Preview data in debugger window.')
 
         except Exception as e:
+                traceback.print_exc()
                 print ('error interlinking connections:', e)
 
     except Exception as e:
+        traceback.print_exc()
         print ('error with saving to demoticon file:', e)
 
 

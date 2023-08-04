@@ -13,7 +13,7 @@ user is to copy and paste into linkedin messages or where ever, then mark as com
 import json
 import csv
 import sys
-
+import traceback
 
 
 
@@ -108,6 +108,7 @@ def compile_approvals(approved_people_filepath, approved_vcs_filepath, interlink
             data = json.load(json_file)
 
     except Exception as e:
+        traceback.print_exc()
         print ('error opening files: ', e)
         return None
 

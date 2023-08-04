@@ -9,7 +9,7 @@ from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-
+import traceback
 import getpass
 import re
 
@@ -52,7 +52,7 @@ def clean_emoticons(input):
         emoji_removed_string = re.sub(r'[^\x00-\x7F]+', '', tempstring)
         return emoji_removed_string
     except Exception as e:
-        print (e)
+        traceback.print_exc()
         return tempstring
 
 
@@ -317,6 +317,7 @@ def check_people(li_people_url, driver):
             return None
         
     except Exception as e:
+        traceback.print_exc()
         print ('error parsing linkedin page:', e)
 
         return 'error'
