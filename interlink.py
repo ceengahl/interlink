@@ -58,7 +58,7 @@ def find_connections_for_vcs(json_file_path, target_connections_count):
 
 
 
-def export_approval_csvs(export_final_csv = False, preview = False, intro_msg_filepath = 'outbound_intro_msg.txt'):
+def export_approval_csvs(export_final_csv = False, preview = False, intro_msg_filepath = 'outbound_intro_msg.txt', approved_people_filepath = 'approve_people.csv', approved_vcs_filepath = 'approve_vcs.csv'):
 
     connections_file_path = 'connections.json'
 
@@ -71,8 +71,7 @@ def export_approval_csvs(export_final_csv = False, preview = False, intro_msg_fi
             if preview == False:
 
                 try:
-                        approved_people_filepath, approved_vcs_filepath = approve.prepare_approval(interlinked_filepath)
-
+                        
                         if export_final_csv == True:
 
                             final_approved_filepath = approve.compile_approvals(approved_people_filepath, approved_vcs_filepath, interlinked_filepath, intro_msg_filepath)
@@ -80,6 +79,8 @@ def export_approval_csvs(export_final_csv = False, preview = False, intro_msg_fi
                             return final_approved_filepath
                         
                         else:
+
+                            approved_people_filepath, approved_vcs_filepath = approve.prepare_approval(interlinked_filepath)
                             
                             return approved_people_filepath, approved_vcs_filepath
 
@@ -206,7 +207,7 @@ def initialize():
     elif response == 5:
         print ('compiling approved people and VCs')
 
-        results = export_approval_csvs(True)
+        result = export_approval_csvs(True)
 
         print ('export finished. output filepath:', result)
 
@@ -218,18 +219,3 @@ if __name__ == "__main__":
 
     initialize()
 
-    
-'''
-user can either filter a list of VC's from scratch or
-start parsing the VC list from complete or with a total connected VC's goal set
-or it can just summarize the connections.json file as is and spit out the remainder
-
-needs to take the approvals already created, and append new companies to those approvals
-needs to record which people have already been reached out to, and skip those ones?
-or should it be based off which VC's you're trying to reach out to?
-should you be able to look at VC's and exclude them?
-
-so a list of VC's to contact that you are connected to, with a approval of bool to connecta
-and a list of 1st degree connections that you are connected to, with a approval of bool to connect
-then it compiles both lists and decides who to connect to and composes the messages accordingly
-'''

@@ -121,7 +121,7 @@ def compile_approvals(approved_people_filepath, approved_vcs_filepath, interlink
 
                 # p['approved'] = True #testing only
                 
-                if p['approved'] == True:
+                if p['approved'].lower() == 'true':
                     for vc in c['connected vcs']:
                         vc_name = vc['vc name']
                         for v in approved_vcs:
@@ -129,7 +129,7 @@ def compile_approvals(approved_people_filepath, approved_vcs_filepath, interlink
                                 
                                 # v['approved'] = True #testing only
                                 
-                                if v['approved'] == True:
+                                if v['approved'].lower() == 'true':
                                     target = vc['2nd degree connections'][0]['primary target']
                                     try:
                                         role = target['role'].title()
