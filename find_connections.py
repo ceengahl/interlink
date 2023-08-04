@@ -85,7 +85,7 @@ def random_pause(a, b, start_string = 'hesitating', end_string = 'continuing...'
     sys.stdout.write('\r' + ' ' * 40 + '\r')
     sys.stdout.flush()
 
-    print (f'finished hesitating for {b} seconds')
+    # print (f'finished hesitating for {b} seconds')
 
     conts = list(end_string)
     for cont in conts:
@@ -127,6 +127,10 @@ def li_login(driver, li_email, li_pw):
 
     print ('\nloading homepage...')
     random_pause(3, 14)
+
+    ###
+        #needs inaccurate log in info warning
+    ###
 
     print ('successfully logged in')
     
