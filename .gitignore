@@ -7,7 +7,6 @@ tier1-vcs.json
 .ds_store
 # Ignore Python bytecode cache
 __pycache__/
-connections.json
 connections__final_network_map.json
 connections__emoticons_removed.json
 connections__emoticons_removed__final_network_map.json
