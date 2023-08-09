@@ -9,6 +9,7 @@ see section 'getting started for non coders' below
 # AUTHENTICATION:
 
 After running "interlink.py", user will be prompted for their linkedin credentials
+*** if Chromedriver does not have permissions when you attempt to run code, in terminal, navigate to the project folder, and type `chmod +x chromedriver` *** if you continue to have issues, try downloading chromedriver from https://chromedriver.chromium.org/downloads, or look up issue.
 
 # HOW TO:
 
